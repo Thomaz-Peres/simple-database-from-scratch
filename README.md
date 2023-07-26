@@ -42,4 +42,13 @@ offsets in the database file. It also keeps a cache of recently-accessed pages i
 and determines when those pages need to be written back to disk.
 
 
-## Making a Simple REPL
+We’re making a clone of sqlite. The “front-end” of sqlite is a SQL compiler that parses a string and outputs an internal representation called bytecode.
+
+This bytecode is passed to the virtual machine, which executes it.
+
+Breaking things into two steps like this has a couple advantages:
+
+Reduces the complexity of each part (e.g. virtual machine does not worry about syntax errors)
+Allows compiling common queries once and caching the bytecode for improved performance
+
+Non-SQL statements like .exit are called “meta-commands”. They all start with a dot, so we check for them and handle them in a separate function.
