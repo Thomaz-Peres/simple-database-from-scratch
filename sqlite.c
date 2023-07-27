@@ -44,6 +44,64 @@ void close_input_buffer(InputBuffer *input_buffer)
     free(input_buffer);
 }
 
+typedef enum {
+  META_COMMAND_SUCCESS,
+  META_COMMAND_UNRECOGNIZED_COMMAND
+} MetaCommandResult;
+
+typedef enum {
+    PREPARE_SUCCESS,
+    PREPARE_UNRECOGNIZED_STATEMENT
+} PrepareResult;
+
+
+// do_meta_command is just a wrapper for existing functionality that leaves room for more commands:
+MetaCommandResult do_meta_command(InputBuffer* input_buffer) {
+  if (strcmp(input_buffer->buffer, ".exit") == 0) {
+    exit(EXIT_SUCCESS);
+  } else {
+    return META_COMMAND_UNRECOGNIZED_COMMAND;
+  }
+}
+
+// Our “prepared statement” right now just contains an enum with two possible values. It will contain more data as we allow parameters in statements:
+typedef enum {
+    STATEMENT_INSERT,
+    STATEMENT_SELECT
+} StatementType;
+
+typedef struct {
+    StatementType type
+} Statement;
+
+// prepare_statement (our “SQL Compiler”) does not understand SQL right now. In fact, it only understands two words:
+// Note that we use strncmp for “insert” since the “insert” keyword will be followed by data. (e.g. insert 1 cstack foo@bar.com)
+PrepareResult prepare_statement(InputBuffer* input_buffer, Statement* statement) {
+    if (strncmp(input_buffer->buffer, "insert", 6) == 0) {
+        statement->type = STATEMENT_INSERT;
+        return PREPARE_SUCCESS;
+    }
+    if (strcmp(input_buffer->buffer, "select") == 0) {
+        statement->type = STATEMENT_SELECT;
+        return PREPARE_SUCCESS;
+    }
+
+    return PREPARE_UNRECOGNIZED_STATEMENT;
+}
+
+// Note that we use strncmp for “insert” since the “insert” keyword will be followed by data. (e.g. insert 1 cstack foo@bar.com)
+
+void execute_statement(Statement* statement) {
+    switch (statement->type) {
+        case (STATEMENT_INSERT):
+            printf("This is where we would do an insert.\n");
+            break;
+        case (STATEMENT_SELECT):
+            printf("This is where we would do an insert.\n");
+            break;
+    }
+}
+
 int main(int argc, char *argv[])
 {
     InputBuffer *input_buffer = new_input_buffer();
@@ -60,7 +118,7 @@ int main(int argc, char *argv[])
                 {
                 case (META_COMMAND_SUCCESS):
                     continue;
-                case (META_COMMAND_UNRECONIZED_COMMAND):
+                case (META_COMMAND_UNRECOGNIZED_COMMAND):
                     printf("Unrocognized command '%s'\n", input_buffer->buffer);
                     continue;
                 }

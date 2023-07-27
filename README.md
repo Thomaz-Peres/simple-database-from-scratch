@@ -52,3 +52,7 @@ Reduces the complexity of each part (e.g. virtual machine does not worry about s
 Allows compiling common queries once and caching the bytecode for improved performance
 
 Non-SQL statements like .exit are called “meta-commands”. They all start with a dot, so we check for them and handle them in a separate function.
+
+Next, we add a step that converts the line of input into our internal representation of a statement. This is our hacky version of the sqlite front-end.
+
+Lastly, we pass the prepared statement to execute_statement. This function will eventually become our virtual machine.
