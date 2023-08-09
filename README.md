@@ -56,3 +56,39 @@ Non-SQL statements like .exit are called “meta-commands”. They all start wit
 Next, we add a step that converts the line of input into our internal representation of a statement. This is our hacky version of the sqlite front-end.
 
 Lastly, we pass the prepared statement to execute_statement. This function will eventually become our virtual machine.
+
+_____
+
+We’re going to start small by putting a lot of limitations on our database. For now, it will:
+
+support two operations: inserting a row and printing all rows
+reside only in memory (no persistence to disk)
+support a single, hard-coded table
+
+Our hard-coded table is going to store users and look like this:
+
+column | type
+--- | ---
+id | integer
+username | varchar(32)
+email | varchar(255)
+
+insert statements are now going to look like this:
+
+    insert 1 cstack foo@bar.com
+
+Now we need to copy that data into some data structure representing the table. SQLite uses a B-tree for fast lookups, inserts and deletes. We’ll start with something simpler. Like a B-tree, it will group rows into pages, but instead of arranging those pages as a tree it will arrange them as an array.
+
+Here’s my plan:
+
+- Store rows in blocks of memory called pages
+- Each page stores as many rows as it can fit
+- Rows are serialized into a compact representation with each page
+- Pages are only allocated as needed
+- Keep a fixed-size array of pointers to pages
+
+I’m making our page size 4 kilobytes because it’s the same size as a page used in the virtual memory systems of most computer architectures. This means one page in our database corresponds to one page used by the operating system. The operating system will move pages in and out of memory as whole units instead of breaking them up
+
+I’m setting an arbitrary limit of 100 pages that we will allocate. When we switch to a tree structure, our database’s maximum size will only be limited by the maximum size of a file. (Although we’ll still limit how many pages we keep in memory at once)
+
+Rows should not cross page boundaries. Since pages probably won’t exist next to each other in memory, this assumption makes it easier to read/write rows.
