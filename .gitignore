@@ -1,4 +1,7 @@
 db
 *.db
-_site/
-TODO
+/specifications/
+/gems
+/cache
+*.gem
+*.rbc
