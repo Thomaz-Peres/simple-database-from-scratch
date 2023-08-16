@@ -4,13 +4,13 @@ checking for -lstdc++... yes
 creating Makefile
 
 current directory: /home/tomenos/dev/Database/gems/unf_ext-0.0.8.2/ext/unf_ext
-make DESTDIR\= sitearchdir\=./.gem.20230815-8141-e1ldh5 sitelibdir\=./.gem.20230815-8141-e1ldh5 clean
+make DESTDIR\= sitearchdir\=./.gem.20230815-19405-9p8lew sitelibdir\=./.gem.20230815-19405-9p8lew clean
 
 current directory: /home/tomenos/dev/Database/gems/unf_ext-0.0.8.2/ext/unf_ext
-make DESTDIR\= sitearchdir\=./.gem.20230815-8141-e1ldh5 sitelibdir\=./.gem.20230815-8141-e1ldh5
+make DESTDIR\= sitearchdir\=./.gem.20230815-19405-9p8lew sitelibdir\=./.gem.20230815-19405-9p8lew
 compiling unf.cc
 linking shared-object unf_ext.so
 
 current directory: /home/tomenos/dev/Database/gems/unf_ext-0.0.8.2/ext/unf_ext
-make DESTDIR\= sitearchdir\=./.gem.20230815-8141-e1ldh5 sitelibdir\=./.gem.20230815-8141-e1ldh5 install
-/usr/bin/install -c -m 0755 unf_ext.so ./.gem.20230815-8141-e1ldh5
+make DESTDIR\= sitearchdir\=./.gem.20230815-19405-9p8lew sitelibdir\=./.gem.20230815-19405-9p8lew install
+/usr/bin/install -c -m 0755 unf_ext.so ./.gem.20230815-19405-9p8lew

@@ -164,7 +164,7 @@ checked program was:
 /* end */
 
 "gcc -o conftest -I/usr/include/ruby-3.0.0/x86_64-linux -I/usr/include/ruby-3.0.0/ruby/backward -I/usr/include/ruby-3.0.0 -I.     -march=x86-64 -mtune=generic -O2 -pipe -fno-plt -fexceptions         -Wp,-D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security         -fstack-clash-protection -fcf-protection -g -ffile-prefix-map=/build/ruby/src=/usr/src/debug/ruby -fPIC  conftest.c  -L. -L/usr/lib -L. -Wl,-O1,--sort-common,--as-needed,-z,relro,-z,now -fstack-protector-strong -rdynamic -Wl,-export-dynamic -Wl,--no-as-needed      -lssl -lcrypto -lcrypto -lssl -lruby  -lssl -lcrypto -lcrypto -lssl -lm   -lc"
-/usr/sbin/ld: /tmp/ccVXOuys.o: in function `t':
+/usr/sbin/ld: /tmp/ccBTVrXg.o: in function `t':
 /home/tomenos/dev/Database/gems/eventmachine-1.2.7/ext/conftest.c:15:(.text+0xc): undefined reference to `rb_thread_blocking_region'
 collect2: error: ld returned 1 exit status
 checked program was:
@@ -328,7 +328,7 @@ checked program was:
 /* end */
 
 "gcc -o conftest -I/usr/include/ruby-3.0.0/x86_64-linux -I/usr/include/ruby-3.0.0/ruby/backward -I/usr/include/ruby-3.0.0 -I.     -march=x86-64 -mtune=generic -O2 -pipe -fno-plt -fexceptions         -Wp,-D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security         -fstack-clash-protection -fcf-protection -g -ffile-prefix-map=/build/ruby/src=/usr/src/debug/ruby -fPIC  conftest.c  -L. -L/usr/lib -L. -Wl,-O1,--sort-common,--as-needed,-z,relro,-z,now -fstack-protector-strong -rdynamic -Wl,-export-dynamic -Wl,--no-as-needed      -lssl -lcrypto -lcrypto -lssl -lruby  -lssl -lcrypto -lcrypto -lssl -lm   -lc"
-/usr/sbin/ld: /tmp/ccqHxKfL.o: in function `t':
+/usr/sbin/ld: /tmp/ccfEckEj.o: in function `t':
 /home/tomenos/dev/Database/gems/eventmachine-1.2.7/ext/conftest.c:15:(.text+0xc): undefined reference to `rb_enable_interrupt'
 collect2: error: ld returned 1 exit status
 checked program was:

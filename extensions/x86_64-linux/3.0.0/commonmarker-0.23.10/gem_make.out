@@ -3,10 +3,10 @@ current directory: /home/tomenos/dev/Database/gems/commonmarker-0.23.10/ext/comm
 creating Makefile
 
 current directory: /home/tomenos/dev/Database/gems/commonmarker-0.23.10/ext/commonmarker
-make DESTDIR\= sitearchdir\=./.gem.20230815-8141-vcjukb sitelibdir\=./.gem.20230815-8141-vcjukb clean
+make DESTDIR\= sitearchdir\=./.gem.20230815-19405-ch1r96 sitelibdir\=./.gem.20230815-19405-ch1r96 clean
 
 current directory: /home/tomenos/dev/Database/gems/commonmarker-0.23.10/ext/commonmarker
-make DESTDIR\= sitearchdir\=./.gem.20230815-8141-vcjukb sitelibdir\=./.gem.20230815-8141-vcjukb
+make DESTDIR\= sitearchdir\=./.gem.20230815-19405-ch1r96 sitelibdir\=./.gem.20230815-19405-ch1r96
 compiling arena.c
 compiling autolink.c
 compiling blocks.c
@@ -58,5 +58,5 @@ compiling xml.c
 linking shared-object commonmarker/commonmarker.so
 
 current directory: /home/tomenos/dev/Database/gems/commonmarker-0.23.10/ext/commonmarker
-make DESTDIR\= sitearchdir\=./.gem.20230815-8141-vcjukb sitelibdir\=./.gem.20230815-8141-vcjukb install
-/usr/bin/install -c -m 0755 commonmarker.so ./.gem.20230815-8141-vcjukb/commonmarker
+make DESTDIR\= sitearchdir\=./.gem.20230815-19405-ch1r96 sitelibdir\=./.gem.20230815-19405-ch1r96 install
+/usr/bin/install -c -m 0755 commonmarker.so ./.gem.20230815-19405-ch1r96/commonmarker

@@ -5,13 +5,15 @@ db
 *.gemspec
 *.rbc
 
+*.out
+*.log
 
 /specifications/
 /gems/
 /cache/
 /doc/
 /plugins/
-/extensions/
+extensions/
 /.config
 /build_info/
 /bin/
