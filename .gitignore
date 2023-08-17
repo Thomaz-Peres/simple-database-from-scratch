@@ -13,7 +13,7 @@ db
 /cache/
 /doc/
 /plugins/
-extensions/
+/extensions/
 /.config
 /build_info/
 /bin/
