@@ -5,7 +5,6 @@ db
 *.gemspec
 *.rbc
 
-*.out
 *.log
 
 /specifications/
@@ -13,7 +12,6 @@ db
 /cache/
 /doc/
 /plugins/
-/extensions/
 /.config
 /build_info/
 /bin/

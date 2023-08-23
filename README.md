@@ -92,3 +92,14 @@ I’m making our page size 4 kilobytes because it’s the same size as a page us
 I’m setting an arbitrary limit of 100 pages that we will allocate. When we switch to a tree structure, our database’s maximum size will only be limited by the maximum size of a file. (Although we’ll still limit how many pages we keep in memory at once)
 
 Rows should not cross page boundaries. Since pages probably won’t exist next to each other in memory, this assumption makes it easier to read/write rows.
+
+Like sqlite, we’re going to persist records by saving the entire database to a file.
+
+We already set ourselves up to do that by serializing rows into page-sized memory blocks. To add persistence, we can simply write those blocks of memory to a file, and read them back into memory the next time the program starts up
+
+To make this easier, we’re going to make an abstraction called the pager. We ask the pager for page number x, and the pager gives us back a block of memory. It first looks in its cache. On a cache miss, it copies data from disk into memory (by reading the database file).
+
+![image](https://cstack.github.io/db_tutorial/assets/images/arch-part5.gif)
+
+
+The get_page() method has the logic for handling a cache miss. We assume pages are saved one after the other in the database file: Page 0 at offset 0, page 1 at offset 4096, page 2 at offset 8192, etc. If the requested page lies outside the bounds of the file, we know it should be blank, so we just allocate some memory and return it. The page will be added to the file when we flush the cache to disk later.
