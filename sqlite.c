@@ -3,6 +3,9 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <string.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <errno.h>
 // #include <teste.h>
 
 #define COLUMN_USERNAME_SIZE 64
@@ -75,16 +78,6 @@ typedef enum {
     PREPARE_STRING_TOO_LONG,
     PREPARE_NEGATIVE_ID,
 } PrepareResult;
-
-
-// do_meta_command is just a wrapper for existing functionality that leaves room for more commands:
-MetaCommandResult do_meta_command(InputBuffer* input_buffer) {
-  if (strcmp(input_buffer->buffer, ".exit") == 0) {
-    exit(EXIT_SUCCESS);
-  } else {
-    return META_COMMAND_UNRECOGNIZED_COMMAND;
-  }
-}
 
 // Our “prepared statement” right now just contains an enum with two possible values. It will contain more data as we allow parameters in statements:
 typedef enum {
@@ -163,7 +156,7 @@ void* get_page(Pager* pager, uint32_t page_num) {
             lseek(pager->file_descriptor, page_num * PAGE_SIZE, SEEK_SET);
             ssize_t bytes_read = read(pager->file_descriptor, page, PAGE_SIZE);
             if (bytes_read == -1) {
-                printf("Error reading file: %d\n"n errno);
+                printf("Error reading file: %d\n", errno);
                 exit(EXIT_FAILURE);
             }
         }
@@ -183,7 +176,7 @@ void* row_slot(Table* table, uint32_t row_num) {
 }
 
 Pager* pager_open(const char* filename) {
-    int fd = open(filenamem
+    int fd = open(filename,
                     O_RDWR |        // Read/Write mode
                         O_CREAT,    // Create file if it doesn't exist
                     S_IWUSR |       // User write permission
@@ -213,20 +206,84 @@ Table* db_open(const char* filename) {
     Pager* pager = pager_open(filename);
     uint32_t num_rows = pager->file_length / ROW_SIZE;
 
-    Table* table = (Table*)malloc(sizeof(Table));
+    Table* table = malloc(sizeof(Table));
     table->pager = pager;
     table->num_rows = num_rows;
-    for (uint32_t i = 0; i < TABLE_MAX_PAGES; i++) {
-        table->pages[i] = NULL;
-    }
+
     return table;
 }
 
-void free_table(Table* table) {
-    for (int i = 0; table->pages[i]; i++) {
-        free(table->pages[i]);
+void pager_flush(Pager* pager, uint32_t page_num, uint32_t size) {
+    if (pager->pages[page_num] == NULL) {
+        printf("Tried to flush null page\n");
+        exit(EXIT_FAILURE);
     }
+
+    off_t offset = lseek(pager->file_descriptor, page_num * PAGE_SIZE, SEEK_SET);
+
+    if (offset == -1) {
+        printf("Error seeking: %d\n", errno);
+        exit(EXIT_FAILURE);
+    }
+
+    ssize_t bytes_written =
+        write(pager->file_descriptor, pager->pages[page_num], size);
+
+    if (bytes_written == -1) {
+        printf("Error writing: %d\n", errno);
+        exit(EXIT_FAILURE);
+    }
+}
+
+void db_close(Table* table) {
+    Pager* pager = table->pager;
+    uint32_t num_full_pages = table->num_rows / ROWS_PER_PAGE;
+
+    for (uint32_t i = 0; i < num_full_pages; i++) {
+        if (pager->pages[i] == NULL) {
+            continue;
+        }
+        pager_flush(pager, i, PAGE_SIZE);
+        free(pager->pages[i]);
+        pager->pages[i] = NULL;
+    }
+
+    // There may be a partial page to write to the end of the file
+    // This should not be needed after we switch to a B-tree
+    uint32_t num_additional_rows = table->num_rows % ROWS_PER_PAGE;
+    if (num_additional_rows > 0) {
+        uint32_t page_num = num_full_pages;
+        if (pager->pages[page_num] != NULL) {
+            pager_flush(pager, page_num, num_additional_rows * ROW_SIZE);
+            free(pager->pages[page_num]);
+            pager->pages[page_num] = NULL;
+        }
+    }
+
+    int result = close(pager->file_descriptor);
+    if (result == -1) {
+        printf("Error closing db file.\n");
+        exit(EXIT_FAILURE);
+    }
+    for (uint32_t i = 0; i < TABLE_MAX_PAGES; i++) {
+        void* page = pager->pages[i];
+        if (page) {
+            free(page);
+            pager->pages[i] = NULL;
+        }
+    }
+    free(pager);
     free(table);
+}
+
+// do_meta_command is just a wrapper for existing functionality that leaves room for more commands:
+MetaCommandResult do_meta_command(InputBuffer* input_buffer, Table* table) {
+  if (strcmp(input_buffer->buffer, ".exit") == 0) {
+    db_close(table);
+    exit(EXIT_SUCCESS);
+  } else {
+    return META_COMMAND_UNRECOGNIZED_COMMAND;
+  }
 }
 
 PrepareResult prepare_insert(InputBuffer* input_buffer, Statement* statement) {
@@ -309,7 +366,15 @@ ExecuteResult execute_statement(Statement* statement, Table* table) {
 
 int main(int argc, char *argv[])
 {
-    Table* table = db_open();
+    if (argc < 2) {
+        printf("Must supply a database filename.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    char* filename = argv[1];
+    Table* table = db_open(filename);
+
+
     InputBuffer *input_buffer = new_input_buffer();
     while (1)
     {
@@ -320,7 +385,7 @@ int main(int argc, char *argv[])
         {
             if (input_buffer->buffer[0] == '.')
             {
-                switch (do_meta_command(input_buffer))
+                switch (do_meta_command(input_buffer, table))
                 {
                 case (META_COMMAND_SUCCESS):
                     continue;

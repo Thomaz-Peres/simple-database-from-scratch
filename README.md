@@ -103,3 +103,24 @@ To make this easier, we’re going to make an abstraction called the pager. We a
 
 
 The get_page() method has the logic for handling a cache miss. We assume pages are saved one after the other in the database file: Page 0 at offset 0, page 1 at offset 4096, page 2 at offset 8192, etc. If the requested page lies outside the bounds of the file, we know it should be blank, so we just allocate some memory and return it. The page will be added to the file when we flush the cache to disk later.
+
+We’ll wait to flush the cache to disk until the user closes the connection to the database. When the user exits, we’ll call a new method called `db_close()`, which
+
+- flushes the page cache to disk
+- closes the database file
+- frees the memory for the Pager and Table data structures
+
+In our current design, the length of the file encodes how many rows are in the database, so we need to write a partial page at the end of the file. That’s why `pager_flush()` takes both a page number and a size. It’s not the greatest design, but it will go away pretty quickly when we start implementing the B-tree.
+
+_______________________________________
+![image](https://github.com/Thomaz-Peres/Study-Notes/assets/58439854/88fe67c8-46b8-4a4e-a4f5-6417db26f1f6)
+
+The first four bytes are the id of the first row (4 bytes because we store a uint32_t). It’s stored in little-endian byte order, so the least significant byte comes first (01), followed by the higher-order bytes (00 00 00). We used memcpy() to copy bytes from our Row struct into the page cache, so that means the struct was laid out in memory in little-endian byte order. That’s an attribute of the machine I compiled the program for. If we wanted to write a database file on my machine, then read it on a big-endian machine, we’d have to change our serialize_row() and deserialize_row() methods to always store and read bytes in the same order.
+
+**NOTE:** If we wanted to ensure that all bytes are initialized, it would suffice to use strncpy instead of memcpy while copying the username and email fields of rows in serialize_row, like so:
+
+________________________________________________
+
+Conclusion part5:
+
+Alright! We’ve got persistence. It’s not the greatest. For example if you kill the program without typing .exit, you lose your changes. Additionally, we’re writing all pages back to disk, even pages that haven’t changed since we read them from disk. These are issues we can address later.
